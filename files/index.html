@@ -1,70 +1,88 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0"/>
-  <title>A-State MakerLab thermalCam mk1</title>
+	<meta charset="utf-8">
+	<title>Image Example</title>
 
-  <!-- CSS  -->
-  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-  <link href="css/materialize.css" type="text/css" rel="stylesheet" media="screen,projection"/>
-  <link href="css/style.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+	<script src="../js/objectdetect.js"></script>
+	<script src="../js/objectdetect.frontalface.js"></script>
+	<script src="../js/objectdetect.profileface.js"></script>
+	<script src="../js/objectdetect.mouth.js"></script>
+	<script src="../js/objectdetect.eye.js"></script>
+	<script src="../js/objectdetect.nose.js"></script>
+	<script src="../js/objectdetect.upperbody.js"></script>	
+	<script>
+	window.onload = function() {
+		var canvas = document.getElementById('canvas');
+		var context = canvas.getContext('2d');
+		var size = 250;
+		var detector;
+		var classifier = objectdetect.upperbody;
+		
+		function detectFaces(canvas) {
+			// Detect faces in the image:
+			var rects = detector.detect(canvas);
+			
+			// Draw rectangles around detected faces:
+			for (var i = 0; i < rects.length; ++i) {
+				var coord = rects[i];
+				context.beginPath();
+				context.lineWidth = 1;
+				context.strokeStyle = 'rgba(0, 255, 255, 0.75)';
+				context.rect(coord[0], coord[1], coord[2], coord[3]);
+				context.stroke();
+			}
+		}
+		
+		function loadImage(src) {
+			image = new Image();
+			image.onload = function() {
+				canvas.width = ~~(size * image.width / image.height);
+				canvas.height = ~~(size);
+				canvas.getContext('2d').drawImage(image, 0, 0, canvas.width, canvas.height);
+				detector = new objectdetect.detector(canvas.width, canvas.height, 1.2, classifier);
+				detectFaces(canvas);
+			}
+			
+			image.src = src;
+		}
+		
+		function handleFileSelect(e) {
+	    	var file = e.target.files[0];
+			var reader = new FileReader();
+			
+			reader.onload = function(e) {
+				loadImage(e.target.result);
+			};
+			reader.readAsDataURL(file);
+		}
+		
+		function handleClassifierSelect(e) {
+			classifier = objectdetect[e.target.value];
+			detector = new objectdetect.detector(canvas.width, canvas.height, 1.2, classifier);
+			canvas.getContext('2d').drawImage(image, 0, 0, canvas.width, canvas.height);
+			detectFaces(canvas);
+		}
+		document.getElementById('file').addEventListener('change', handleFileSelect, false);
+		document.getElementById('select').addEventListener('change', handleClassifierSelect, false);
+	
+		loadImage('images/faces.jpg');
+	}
+    </script>
 </head>
+
 <body>
-  <nav class="red darken-1" role="navigation">
-    <div class="nav-wrapper container"><a href="#!" class="brand-logo"><i class="material-icons">visibility</i>thermalCam</a>
-      <ul class="right hide-on-med-and-down">
-        <li><a href="#">A-State MakerLab</a></li>
-	<li><a href="#">Physics @ A-State</a></li>
-      </ul>
-
-      
-    </div>
-  </nav>
-  <div class="section no-pad-bot grey" id="index-banner">
-    <div class="container">
-
-      <div class="row">
-        <div class="col s12 m6">
-          <div class="card grey darken-1">
-            <div class="card-image white-text">
-              <img src="images/image.png">
-              <span class="card-title"></span>
-              <p></p>
-            </div>
-            <div class="card-action">
-              Thermal Camera Placeholder
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <footer class="page-footer black">
-    <div class="container">
-      <div class="row">
-        <div class="col l6 s12">
-          <h5 class="white-text">What is this contraption?</h5>
-          <p class="grey-text text-lighten-4"></p>
-
-
-        </div>
-        
-      </div>
-    </div>
-    <div class="footer-copyright">
-      <div class="container">
-      Made by <a class="orange-text text-lighten-3" href="http://materializecss.com">Materialize</a>
-      </div>
-    </div>
-  </footer>
-
-
-  <!--  Scripts-->
-  <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
-  <script src="js/materialize.js"></script>
-  <script src="js/init.js"></script>
-
-  </body>
+	<h1>Detect Faces</h1>
+	<p><canvas id="canvas"></canvas></p>
+	<input type="file" id="file" name="file">
+	<select id="select">
+		<option selected value="frontalface">Frontal Face</option>
+		<option value="profileface">Profile Face</option>
+		<option value="mouth">Mouth</option>
+		<option value="eye">Eye</option>
+		<option value="nose">Nose</option>
+		<option value="upperbody">Upperbody</option>
+	</select>
+</script>
+</body>
 </html>
