@@ -1,12 +1,12 @@
 {
   "name": "express1",
   "version": "1.0.0",
-  "description": "Tutorial #1",
+  "description": "thermal camera app",
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "Makers NS",
+  "author": "A-State MakerLab",
   "license": "ISC",
   "dependencies": {
     "express": "^4.13.4"
